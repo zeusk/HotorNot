@@ -14,27 +14,38 @@ def main(search_term, search_type, num_tweets):
 
 def plot_results():
     l_client = pymongo.MongoClient()
+    l_dateFormat = "%a %b %d %H:%M:%S %Y"
     l_allTweets = l_client.twitter_db.tweets.find()
     l_posTweets = l_client.twitter_db.tweets.find({"sentiment" : "positive"})
     l_negTweets = l_client.twitter_db.tweets.find({"sentiment" : "negative"})
     l_neuTweets = l_client.twitter_db.tweets.find({"sentiment" : "neutral"})
+    count = 0
     l_pos_score_file = open("scores.pos", "w")
     l_pos_time_file  = open("times.pos", "w")
     for l_tweet in l_posTweets:
         l_dateString = l_tweet['time'].replace("+0000 ", "")
-        l_dateFormat = "%a %b %d %H:%M:%S %Y"
         l_outputDateString = datetime.datetime.strptime(l_dateString, l_dateFormat).strftime("%Y-%m-%d %H:%M:%S +0000")
         l_pos_score_file.write("%.4f\n" % l_tweet['score'])
+        l_pos_time_file.write("%s\n" % l_outputDateString)
+        count += 1
+    if count == 0:
+        l_outputDateString = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
+        l_pos_score_file.write("%.4f\n" % 0)
         l_pos_time_file.write("%s\n" % l_outputDateString)
     l_pos_score_file.close()
     l_pos_time_file.close()
     l_neg_score_file = open("scores.neg", "w")
     l_neg_time_file  = open("times.neg", "w")
+    count = 0
     for l_tweet in l_negTweets:
         l_dateString = l_tweet['time'].replace("+0000 ", "")
-        l_dateFormat = "%a %b %d %H:%M:%S %Y"
         l_outputDateString = datetime.datetime.strptime(l_dateString, l_dateFormat).strftime("%Y-%m-%d %H:%M:%S +0000")
         l_neg_score_file.write("%.4f\n" % l_tweet['score'])
+        l_neg_time_file.write("%s\n" % l_outputDateString)
+        count += 1
+    if count == 0:
+        l_outputDateString = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
+        l_neg_score_file.write("%.4f\n" % 0)
         l_neg_time_file.write("%s\n" % l_outputDateString)
     l_neg_score_file.close()
     l_neg_time_file.close()
